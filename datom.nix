@@ -3,7 +3,7 @@ let
     catAttrs attrNames hasAttr getAttr mapAttrs listToAttrs concatStringsSep
     foldl' elem length elemAt head tail filter concatMap sort lessThan fromJSON
     toJSON readFile toFile intersectAttrs functionArgs typeOf isAttrs deepSeq
-    trace getFlake;
+    trace getFlake isList;
 
 in
 rec {
@@ -74,6 +74,11 @@ rec {
     if list == [ ] then [ ] else
     let x = head list;
     in [ x ] ++ unique (remove x list);
+
+  flatten = x:
+    if isList x
+    then concatMap (y: flatten y) x
+    else [ x ];
 
   flattenNV = list: map (x: x.value) list;
 
