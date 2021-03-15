@@ -90,6 +90,9 @@ rec {
   attrToNamedList = attrs:
     mapAttrsToList (name: value: value // { inherit name; }) attrs;
 
+  makeSearchPath = subDir: paths: concatStringsSep ":"
+    (map (path: path + "/" + subDir) (filter (x: x != null) paths));
+
   matchEnum = enum: match:
     genAttrs enum (name: name == match);
 
