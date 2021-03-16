@@ -105,12 +105,18 @@ rec {
   eksportJSON = neim: datom: toFile neim (toJSON datom);
 
   getFleik = fleik:
-    getFlake (
-      (optionalString (fleik.type == "git") "git+")
-      + fleik.url + "?"
-      + (optionalString (fleik ? ref) "ref=${fleik.ref}")
-      + (optionalString (fleik ? rev) "${optionalString (fleik ? ref) "&"}rev=${fleik.rev}")
-    );
+    let
+      url = concatStringsSep "" [
+        (optionalString (fleik.type == "git") "git+")
+        fleik.url
+        "?"
+        (optionalString (fleik ? ref) "ref=${fleik.ref}")
+        (optionalString (fleik ? rev) "${optionalString (fleik ? ref) "&"}rev=${fleik.rev}")
+      ];
+      noFlakeNix = fleik ? flake && (!fleik.flake);
+      kol = if noFlakeNix then fetchTree else getFlake;
+    in
+    kol url;
 
   kopiNiks = path: toFile (baseNameOf path)
     (readFile path);
